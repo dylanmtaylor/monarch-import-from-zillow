@@ -54,7 +54,6 @@ class ProcessingResult:
     latest_value: float
     property_metadata: PropertyMetadata
     purchase_date: Optional[date] = None
-    purchase_price: Optional[float] = None
     interpolation_method: str = "forward-fill"
     warnings: List[str] = field(default_factory=list)
 

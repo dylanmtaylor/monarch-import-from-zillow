@@ -63,32 +63,16 @@ class TestProcessor(unittest.TestCase):
         self.assertEqual(result.initial_value, 310000.0)
         self.assertEqual(result.daily_balances[0][0], purchase_date)
 
-    def test_purchase_price_override(self):
-        """When purchase_price is provided, starting valuation on purchase_date matches it."""
-        purchase_date = date(2021, 2, 15)
-        purchase_price = 305000.0
-        result = process_zillow_valuation(
-            raw_points=self.raw_points,
-            purchase_date=purchase_date,
-            purchase_price=purchase_price,
-            end_date=date(2021, 4, 1),
-            interpolation_method="forward-fill",
-        )
-        self.assertEqual(result.start_date, purchase_date)
-        self.assertEqual(result.initial_value, purchase_price)
-        self.assertEqual(result.daily_balances[0][1], purchase_price)
-
     def test_purchase_date_before_zillow_earliest(self):
         """Handle purchase date prior to Zillow records gracefully."""
         purchase_date = date(2020, 6, 1)  # before 2021-01-01
         result = process_zillow_valuation(
             raw_points=self.raw_points,
             purchase_date=purchase_date,
-            purchase_price=275000.0,
             end_date=date(2021, 1, 15),
         )
         self.assertEqual(result.start_date, purchase_date)
-        self.assertEqual(result.initial_value, 275000.0)
+        self.assertEqual(result.initial_value, 300000.0)
         self.assertTrue(len(result.warnings) > 0)
 
     def test_forward_fill_interpolation(self):

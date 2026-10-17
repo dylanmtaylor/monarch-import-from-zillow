@@ -9,7 +9,6 @@ from .models import PropertyMetadata, ProcessingResult, ValuationPoint
 def process_zillow_valuation(
     raw_points: List[ValuationPoint],
     purchase_date: Optional[date] = None,
-    purchase_price: Optional[float] = None,
     end_date: Optional[date] = None,
     interpolation_method: str = "forward-fill",
     property_metadata: Optional[PropertyMetadata] = None,
@@ -20,8 +19,6 @@ def process_zillow_valuation(
         raw_points: List of ValuationPoint objects parsed from Zillow data.
         purchase_date: Optional date of property purchase. If omitted, history defaults
                        to going back to the beginning of time in Zillow data.
-        purchase_price: Optional initial purchase price in USD. If provided, anchors
-                        the balance on purchase_date.
         end_date: Optional end date for the history timeline (defaults to today or the latest
                   data point if in the future).
         interpolation_method: "forward-fill" (default, step-wise carrying forward of valuation)
@@ -57,11 +54,7 @@ def process_zillow_valuation(
         if purchase_date < earliest_zillow_date:
             warnings.append(
                 f"Purchase date ({purchase_date}) is earlier than Zillow's earliest record ({earliest_zillow_date}). "
-                + (
-                    f"Using provided purchase price (${purchase_price:,.2f}) as starting valuation."
-                    if purchase_price is not None
-                    else f"Back-filling starting valuation using earliest Zillow estimate (${sorted_points[0].value:,.2f})."
-                )
+                f"Back-filling starting valuation using earliest Zillow estimate (${sorted_points[0].value:,.2f})."
             )
     else:
         # Default to the beginning of time in Zillow data
@@ -82,14 +75,10 @@ def process_zillow_valuation(
     # Build reference anchors: list of (date, value)
     anchors: List[Tuple[date, float]] = []
 
-    # Determine starting value on start_date
-    if purchase_date is not None and purchase_price is not None:
-        initial_value = float(purchase_price)
-    else:
-        # Find valuation corresponding to start_date from Zillow points
-        initial_value = _determine_value_at_date(
-            sorted_points, start_date, method_norm
-        )
+    # Determine starting value on start_date from Zillow points
+    initial_value = _determine_value_at_date(
+        sorted_points, start_date, method_norm
+    )
 
     anchors.append((start_date, initial_value))
 
@@ -156,7 +145,6 @@ def process_zillow_valuation(
         latest_value=daily_balances[-1][1],
         property_metadata=property_metadata,
         purchase_date=purchase_date,
-        purchase_price=purchase_price,
         interpolation_method="linear" if method_norm == "linear" else "forward-fill",
         warnings=warnings,
     )

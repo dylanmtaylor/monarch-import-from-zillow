@@ -52,12 +52,6 @@ def build_parser() -> argparse.ArgumentParser:
         ),
     )
     parser.add_argument(
-        "--purchase-price",
-        type=float,
-        default=None,
-        help="Purchase price in USD. Anchors starting balance on purchase date.",
-    )
-    parser.add_argument(
         "-o", "--output",
         default="./output/monarch_zillow_balance_history.csv",
         help="Destination path for Monarch balance history CSV (default: ./output/monarch_zillow_balance_history.csv).",
@@ -170,8 +164,6 @@ def main() -> None:
     print(f"Property / Asset: {asset_label}")
     print(f"Output file:      {output_path}")
     print(f"Start timeline:   {purchase_desc}")
-    if args.purchase_price:
-        print(f"Purchase price:   ${args.purchase_price:,.2f}")
     print(f"Interpolation:    {args.method}")
     print("----------------------------------------------------------")
 
@@ -179,7 +171,6 @@ def main() -> None:
         result = process_zillow_valuation(
             raw_points=raw_points,
             purchase_date=args.purchase_date,
-            purchase_price=args.purchase_price,
             end_date=args.end_date,
             interpolation_method=args.method,
             property_metadata=metadata,

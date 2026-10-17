@@ -21,7 +21,6 @@ Zillow maintains extensive historical valuation datasets (Zestimate history) spa
 - **Built Specifically for Real Estate Assets**: Only generates balance history (`Date,Balance`). No extraneous transaction files.
 - **Purchase Date Support**:
   - Provide an optional `--purchase-date` / `-p` (`YYYY-MM-DD`) to start your asset's timeline on the exact day you acquired the home.
-  - Optionally specify `--purchase-price` to lock in your initial acquisition cost.
   - **Beginning-of-Time Default**: If no purchase date is provided, the timeline automatically defaults to the earliest available valuation record in Zillow's dataset.
 - **Continuous Daily Balance History**: Generates daily balance snapshots (carrying forward or interpolating valuations across non-estimate days) to eliminate chart spikes and gaps in Monarch.
 - **Configurable Timeline Interpolation**:
@@ -72,7 +71,7 @@ Because Zillow protects its platform with PerimeterX anti-bot challenges, the mo
 
 ```bash
 # With purchase date (starts timeline on purchase date)
-zillow-to-monarch ./zillow_valuation_12345678.json -p 2021-04-15 --purchase-price 425000
+zillow-to-monarch ./zillow_valuation_12345678.json -p 2021-04-15
 
 # Without purchase date (defaults to the beginning of time in Zillow records)
 zillow-to-monarch ./zillow_valuation_12345678.json
@@ -93,8 +92,8 @@ zillow-to-monarch "https://www.zillow.com/homedetails/123-Main-St/12345678_zpid/
 ### Command-Line Options
 
 ```text
-usage: zillow-to-monarch [-h] [-p PURCHASE_DATE] [--purchase-price PURCHASE_PRICE]
-                         [-o OUTPUT] [-m {forward-fill,linear}] [-e END_DATE]
+usage: zillow-to-monarch [-h] [-p PURCHASE_DATE] [-o OUTPUT]
+                         [-m {forward-fill,linear}] [-e END_DATE]
                          [-a ASSET_NAME] [-c COOKIE] [--snippet]
                          [SOURCE]
 
@@ -105,7 +104,6 @@ options:
   -h, --help            Show this help message and exit.
   -p, --purchase-date   Date property was purchased (YYYY-MM-DD). If omitted,
                         defaults to the beginning of time in Zillow records.
-  --purchase-price      Purchase price in USD. Anchors starting balance on purchase date.
   -o, --output          Destination path for Monarch balance history CSV
                         (default: ./output/monarch_zillow_balance_history.csv).
   -m, --method          Daily timeline method: 'forward-fill' (step-wise, default)
@@ -128,7 +126,6 @@ Source:           Local File: /home/user/Downloads/zillow_valuation_12345678.jso
 Property / Asset: 742 Evergreen Terrace - Springfield, OR
 Output file:      /home/user/output/monarch_zillow_balance_history.csv
 Start timeline:   2021-04-15 (Purchase Date)
-Purchase price:   $425,000.00
 Interpolation:    forward-fill
 ----------------------------------------------------------
 ✅ Successfully parsed 96 historical Zillow valuation points.

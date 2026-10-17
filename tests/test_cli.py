@@ -70,7 +70,7 @@ class TestCLI(unittest.TestCase):
             # 2021-01-01 to 2021-03-01 is 60 days -> 61 lines (header + 60 days)
             self.assertEqual(len(lines), 61)
 
-    def test_cli_with_purchase_date_and_price(self):
+    def test_cli_with_purchase_date(self):
         with tempfile.TemporaryDirectory() as tmpdir:
             input_file = os.path.join(tmpdir, "input.json")
             with open(input_file, "w", encoding="utf-8") as f:
@@ -89,8 +89,6 @@ class TestCLI(unittest.TestCase):
                         output_file,
                         "-p",
                         "2021-02-01",
-                        "--purchase-price",
-                        "405000",
                         "-e",
                         "2021-03-01",
                     ],
@@ -98,13 +96,13 @@ class TestCLI(unittest.TestCase):
                     main()
 
             output = f.getvalue()
-            self.assertIn("Starting Valuation: $405,000.00", output)
+            self.assertIn("Starting Valuation: $410,000.00", output)
             self.assertIn("Latest Valuation:   $420,000.00", output)
             self.assertTrue(os.path.isfile(output_file))
 
             with open(output_file, "r", encoding="utf-8") as csv_f:
                 lines = csv_f.readlines()
-            self.assertEqual(lines[1].strip(), "2021-02-01,405000.00")
+            self.assertEqual(lines[1].strip(), "2021-02-01,410000.00")
 
 
 if __name__ == "__main__":
