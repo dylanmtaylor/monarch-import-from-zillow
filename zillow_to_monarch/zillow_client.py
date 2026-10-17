@@ -15,19 +15,14 @@ DEFAULT_USER_AGENT = (
 )
 
 GRAPHQL_QUERY = """
-query HomeValueChartDataQuery($zpid: ID!, $useHVChartDataSource: Boolean) {
+query HomeValueChartDataQuery($zpid: ID!, $metricType: HomeValueChartMetricType, $timePeriod: HomeValueChartTimePeriod) {
   property(zpid: $zpid) {
-    zpid
-    zestimate
-    zestimateHistory(useHVChartDataSource: $useHVChartDataSource) {
-      t
-      v
-    }
-    address {
-      streetAddress
-      city
-      state
-      zipcode
+    homeValueChartData(metricType: $metricType, timePeriod: $timePeriod) {
+      points {
+        x
+        y
+      }
+      name
     }
   }
 }
@@ -94,8 +89,10 @@ def fetch_zillow_history(
     payload = {
         "operationName": "HomeValueChartDataQuery",
         "variables": {
-            "zpid": zpid,
-            "useHVChartDataSource": True,
+            "zpid": int(zpid) if zpid.isdigit() else zpid,
+            "timePeriod": "TEN_YEARS",
+            "metricType": "LOCAL_HOME_VALUES",
+            "forecast": True,
         },
         "query": GRAPHQL_QUERY,
     }
@@ -103,10 +100,7 @@ def fetch_zillow_history(
     headers = {
         "Content-Type": "application/json",
         "User-Agent": DEFAULT_USER_AGENT,
-        "Accept": "*/*",
-        "Accept-Language": "en-US,en;q=0.9",
         "client-id": "hdp-react-web-client",
-        "x-caller-id": "hdp-react-web-client",
     }
 
     if session_cookie:

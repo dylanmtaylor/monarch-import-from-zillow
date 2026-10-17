@@ -20,9 +20,11 @@ SNIPPET_JS = r"""
     operationName: "HomeValueChartDataQuery",
     variables: {
       zpid: zpid,
-      useHVChartDataSource: true
+      timePeriod: "TEN_YEARS",
+      metricType: "LOCAL_HOME_VALUES",
+      forecast: true
     },
-    query: "query HomeValueChartDataQuery($zpid: ID!, $useHVChartDataSource: Boolean) { property(zpid: $zpid) { zpid zestimate zestimateHistory(useHVChartDataSource: $useHVChartDataSource) { t v } address { streetAddress city state zipcode } } }"
+    query: "query HomeValueChartDataQuery($zpid: ID!, $metricType: HomeValueChartMetricType, $timePeriod: HomeValueChartTimePeriod) { property(zpid: $zpid) { homeValueChartData(metricType: $metricType, timePeriod: $timePeriod) { points { x y } name } } }"
   };
 
   try {
@@ -40,11 +42,11 @@ SNIPPET_JS = r"""
     }
 
     const data = await response.json();
-    const history = data?.data?.property?.zestimateHistory;
+    const chart = data?.data?.property?.homeValueChartData;
+    const homeSeries = Array.isArray(chart) ? chart.find(s => s.name === "This home") || chart[0] : null;
 
-    if (!history || history.length === 0) {
-      console.warn("⚠️ No zestimateHistory points returned. Checking alternative chart data in page context...");
-      // Fallback: check global homeValueChartData if present
+    if (!homeSeries || !homeSeries.points || homeSeries.points.length === 0) {
+      console.warn("⚠️ No chart points returned. Checking fallback in page context...");
       if (typeof homeValueChartData !== "undefined") {
         downloadJson({ homeValueChartData: homeValueChartData, zpid: zpid }, `zillow_${zpid}_chart.json`);
         return;
@@ -52,7 +54,7 @@ SNIPPET_JS = r"""
       throw new Error("No valuation history returned.");
     }
 
-    console.log(`✅ Successfully extracted ${history.length} historical valuation points!`);
+    console.log(`✅ Successfully extracted ${homeSeries.points.length} historical valuation points!`);
 
     // Download JSON file
     downloadJson(data, `zillow_valuation_${zpid}.json`);
