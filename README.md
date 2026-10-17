@@ -1,6 +1,6 @@
 # Monarch Import from Zillow (`zillow-to-monarch`)
 
-Generate continuous daily real estate asset balance history from Zillow for **Monarch Money**.
+Convert Zillow property valuation history into **Monarch Money-compatible** continuous daily balance history CSV files.
 
 ---
 

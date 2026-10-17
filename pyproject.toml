@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "monarch-import-from-zillow"
 version = "0.1.0"
-description = "Generate continuous daily real estate balance history from Zillow for import into Monarch Money."
+description = "Convert Zillow property valuation history into Monarch Money formatted continuous daily balance history CSV files."
 readme = "README.md"
 requires-python = ">=3.8"
 license = { text = "MIT" }
